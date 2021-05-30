@@ -1,0 +1,30 @@
+Implementation of Scheduler
+*This implementation of a scheduler using round-robin techniques with the handling of context switches
+*Round-Robin scheduler uses time slices that are assigned to each task in equal proportions
+*First will use the SysTick to context switch, and later code is changed to use PendSVC
+*This project will have 4 tasks
+
+What are tasks?
+    A task is nothing but a piece of code with a specific job with its own seperate stack for creating
+varaibles when it runs on the CPU. When the CPU decides to remove a task, the scheduler will save it's
+context(state) of the task in a private stack. So a tasks state is never lost, only postponed. 
+
+Creating Tasks
+    In this project, 4 tasks will be created in single functions called taskx_handler. They don't return
+anything.
+
+Stack Pointers
+    each task will change SP from MSP PSP. The STM32F407xx has two SRAM. SRAM1 and SRAM2, which total to 
+128kb of memory. This must be divided into 1kb sections for each task to have a private stack. The private
+stack, or kernel stack, will have its own memory too. This means a total of 5kb will be used. ARM is full
+descending, so task1 stack will have the highest memory address, growing down. 
+
+What is Scheduling?
+    Scheduling is just an algorithm which takes the decision of pre-empting a running task away
+from the cpu and takes the decision about which task should run on the cpu next. This decision is based on many factors, 
+such as system load, priority of tasks, shared resource access, or simple round robin method
+
+What is context swtiching?
+    Context switching is the procedure of SWITCHIN OUT of the currently running task from the CPU after 
+saving the task's execution or state and SWITCHING IN the next task's to run on the CPU by retreiving the past 
+execution context os state of the task
