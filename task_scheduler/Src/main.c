@@ -9,8 +9,6 @@
  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
  * All rights reserved.</center></h2>
  *
- * This software component is licensed by ST under BSD 3-Clause license,
- * the "License"; You may not use this file except in compliance with the
  * License. You may obtain a copy of the License at:
  *                        opensource.org/licenses/BSD-3-Clause
  *
@@ -39,14 +37,19 @@
 #define T4_STACK_START      ((SRAM_END) - (3 * SIZE_TASK_STACK))
 #define SCHED_STACK_START   ((SRAM_END) - (4 * SIZE_TASK_STACK))
 
+#define TICK_HZ             1000U
+#define HSI_CLOCK           16000000U
+#define SYSTICK_TIM_CLK     HSI_CLOCK
 void task1_handler(void);
 void task2_handler(void);
 void task3_handler(void);
 void task4_handler(void);
 
+void init_systick_timer(uint32_t tick_hz);
+
 int main(void)
 {
-	printf("Hello faggot\n");
+    init_systick_timer(TICK_HZ);
     /* Loop forever */
 	for(;;);
 }
@@ -81,4 +84,29 @@ void task4_handler(void)
     {
         printf("Task 4\n");
     }
+}
+
+void SysTick_Handler(void)
+{
+    printf("In SysTick Handler\n");
+}
+
+void init_systick_timer(uint32_t tick_hz)
+{
+    //Systick reload value register
+    uint32_t *pSRVR = (uint32_t *)0xE000E014;
+    uint32_t *pSCVR = (uint32_t *)0xE000E010;
+    uint32_t count_value = (SYSTICK_TIM_CLK/tick_hz) -1;
+
+    //clear value of SVR
+    *pSRVR &= ~(0xffffffff);
+
+    //load value into SVR
+    *pSRVR |= count_value;
+
+    //do some setting in SYST_CVR 
+    *pSCVR |= (1 << 1) | (1 << 2); //enables systick exception request and indicates clock source, respectivley.
+
+    //enables systick
+    *pSCVR |= (1 << 0); //enable systick
 }

@@ -27,4 +27,16 @@ such as system load, priority of tasks, shared resource access, or simple round 
 What is context swtiching?
     Context switching is the procedure of SWITCHIN OUT of the currently running task from the CPU after 
 saving the task's execution or state and SWITCHING IN the next task's to run on the CPU by retreiving the past 
-execution context os state of the task
+execution context os state of the task.
+    When exiting task, state of task needs to be saved to private stack. Stacking and unstacking is done 
+like any other handler, pushing r0 through r3, r12, lr , pc and xprs to stack. When jumping from one task
+to another, while in handler, change return address to next task. Push r4 to r11 manually. 
+
+Systick Programming
+    Processory clock for Cortext m defualt is 16mhz. Systick timer count is 16MHz. 1 millisecond is KHz in 
+frequency domain. To bring timer count clock from 16MHz to 1KHz, use divisor(reload value). 16MHz(16000000) /
+16000 count or "reload" value == 1000Hz or 1KHz. Count value is what is fed to systick timer.  
+    Systick Reload Value Register (SYST_RVR) specifies the start value to load into the Systick Control
+Value Register(SYST_CVR). Regsiter summary in Programmer Manual. Value loaded from RVR into CVR. CVR counts 
+down and when 0, gets value from RVR again. Systick exception isn't invoked when CVR reaches zero, but rather
+when new value is reloaded. So always store N - 1 count. 
