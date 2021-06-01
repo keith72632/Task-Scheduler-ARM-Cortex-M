@@ -19,12 +19,14 @@
 #include <stdio.h>
 #include "main.h"
 #include "stack.h"
+#include "faults.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
 extern uint32_t task_handlers[];
+extern uint32_t psp_of_task[];
 
 
 void task1_handler(void);
@@ -33,12 +35,12 @@ void task3_handler(void);
 void task4_handler(void);
 
 void init_systick_timer(uint32_t tick_hz);
-
-
-
+void switch_sp_to_psp(void);
 
 int main(void)
 {
+    enable_processor_faults(1, 1, 1);
+
     init_scheduler_stack(SCHED_STACK_START);
 
     //creating addray of handlers
@@ -49,7 +51,12 @@ int main(void)
 
 
     init_task_stack();
+
     init_systick_timer(TICK_HZ);
+
+    switch_sp_to_psp();
+
+    task1_handler();
     /* Loop forever */
 	for(;;);
 }
@@ -88,7 +95,7 @@ void task4_handler(void)
 
 void SysTick_Handler(void)
 {
-    printf("In SysTick Handler\n");
+
 }
 
 void init_systick_timer(uint32_t tick_hz)
@@ -111,4 +118,23 @@ void init_systick_timer(uint32_t tick_hz)
     *pSCVR |= (1 << 0); //enable systick
 }
 
+uint8_t current_task = 0; //task1 is running
 
+uint8_t get_psp_value(void)
+{
+	return psp_of_task[current_task];
+}
+
+__attribute__((naked)) void switch_sp_to_psp(void)
+{
+	//initialize the psp with task1 stack start
+	__asm volatile("PUSH {LR}"); //save lr value incase other functions corrupt it
+	__asm volatile("BL get_psp_value"); // Branch with link. this is why is saved the lr
+	__asm volatile("MSR PSP,R0");// value in get_psp_value returned as r0. init psp
+	__asm volatile("POP {LR}"); //resume lr
+
+	//change sp to psp
+	__asm volatile("MOV R0,0x02");
+	__asm volatile("MSR CONTROL,R0");
+	__asm volatile("BX LR");
+}

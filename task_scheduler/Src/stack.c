@@ -6,6 +6,7 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 #include "main.h"
 
 //all addresses of stack starts. These are unsigned ints, so must be cast to pointers
@@ -30,7 +31,9 @@ void init_task_stack(void)
 	//loop through pPSP and assign register value
 	for(int i = 0; i < MAX_TASKS; i++)
 	{
+        //initialize pPSP to addr of each task. should be 0x400 or 1024 KB apart
 		pPSP = (uint32_t *)psp_of_task[i];
+        printf("Task%d PSP intialized address: %p\n\n", i+1, pPSP);
 
         //XPSR
         pPSP--;
@@ -39,6 +42,7 @@ void init_task_stack(void)
         //PC. Address of task handler
         pPSP--;
         *pPSP = task_handlers[i];
+        printf("Return address of task%d handler(PC): %lx\n\n", i+1, *pPSP); 
 
         //LR
         pPSP--;
@@ -51,6 +55,7 @@ void init_task_stack(void)
             *pPSP = i;
         }
 
+        //store value of psp
         psp_of_task[i] = (uint32_t)pPSP;
 	}
 }
