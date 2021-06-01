@@ -17,38 +17,30 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "main.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-/**Macros**/
-#define SIZE_TASK_STACK     1024U
-#define SIZE_SCHED_STACK    1024U
 
-#define SRAM_START          0x20000000U
-#define SRAM_SIZE           ((128) * (1024))
-#define SRAM_END            ((SRAM_START) + (SRAM_SIZE))
 
-/*Task memory location*/
-#define T1_STACK_START      SRAM_END
-#define T2_STACK_START      ((SRAM_END) - (SIZE_TASK_STACK))
-#define T3_STACK_START      ((SRAM_END) - (2 * SIZE_TASK_STACK))
-#define T4_STACK_START      ((SRAM_END) - (3 * SIZE_TASK_STACK))
-#define SCHED_STACK_START   ((SRAM_END) - (4 * SIZE_TASK_STACK))
-
-#define TICK_HZ             1000U
-#define HSI_CLOCK           16000000U
-#define SYSTICK_TIM_CLK     HSI_CLOCK
 void task1_handler(void);
 void task2_handler(void);
 void task3_handler(void);
 void task4_handler(void);
 
 void init_systick_timer(uint32_t tick_hz);
+__attribute__((naked)) void init_scheduler_stack(uint32_t scheduler_stack_start);
+void init_task_stack();
+
+uint32_t psp_of_task[MAX_TASKS] = {T1_STACK_START, T2_STACK_START, T3_STACK_START, T4_STACK_START};
 
 int main(void)
 {
+    init_scheduler_stack(SCHED_STACK_START);
+
+    init_task_stack();
     init_systick_timer(TICK_HZ);
     /* Loop forever */
 	for(;;);
@@ -109,4 +101,22 @@ void init_systick_timer(uint32_t tick_hz)
 
     //enables systick
     *pSCVR |= (1 << 0); //enable systick
+}
+
+__attribute__((naked)) void init_scheduler_stack(uint32_t scheduler_stack_start)
+{
+    //first argument passed to this function is r0 
+    //__asm volatile("MSR MSP,R0"); 
+    __asm volatile ("MSR MSP,R0": : "r"(scheduler_stack_start) : );
+    //Branch indirect back to main, which is stored in LR
+    __asm volatile ("BX LR");
+}
+
+void init_task_stack(void)
+{
+	uint32_t *pPSP;
+	for(int i = 0; i < MAX_TASKS; i++)
+	{
+		pPSP = (uint32_t *)psp_of_tasks[i];
+	}
 }
