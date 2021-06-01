@@ -18,11 +18,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "main.h"
+#include "stack.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+extern uint32_t task_handlers[];
 
 
 void task1_handler(void);
@@ -31,14 +33,20 @@ void task3_handler(void);
 void task4_handler(void);
 
 void init_systick_timer(uint32_t tick_hz);
-__attribute__((naked)) void init_scheduler_stack(uint32_t scheduler_stack_start);
-void init_task_stack();
 
-uint32_t psp_of_task[MAX_TASKS] = {T1_STACK_START, T2_STACK_START, T3_STACK_START, T4_STACK_START};
+
+
 
 int main(void)
 {
     init_scheduler_stack(SCHED_STACK_START);
+
+    //creating addray of handlers
+    task_handlers[0] = (uint32_t)task1_handler;
+    task_handlers[1] = (uint32_t)task2_handler;
+    task_handlers[2] = (uint32_t)task3_handler;
+    task_handlers[3] = (uint32_t)task4_handler;
+
 
     init_task_stack();
     init_systick_timer(TICK_HZ);
@@ -73,7 +81,7 @@ void task3_handler(void)
 void task4_handler(void)
 {
     while(1)
-    {
+    { 
         printf("Task 4\n");
     }
 }
@@ -103,20 +111,4 @@ void init_systick_timer(uint32_t tick_hz)
     *pSCVR |= (1 << 0); //enable systick
 }
 
-__attribute__((naked)) void init_scheduler_stack(uint32_t scheduler_stack_start)
-{
-    //first argument passed to this function is r0 
-    //__asm volatile("MSR MSP,R0"); 
-    __asm volatile ("MSR MSP,R0": : "r"(scheduler_stack_start) : );
-    //Branch indirect back to main, which is stored in LR
-    __asm volatile ("BX LR");
-}
 
-void init_task_stack(void)
-{
-	uint32_t *pPSP;
-	for(int i = 0; i < MAX_TASKS; i++)
-	{
-		pPSP = (uint32_t *)psp_of_tasks[i];
-	}
-}
