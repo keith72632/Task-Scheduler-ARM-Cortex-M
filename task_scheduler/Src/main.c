@@ -39,6 +39,8 @@ void switch_sp_to_psp(void);
 
 int main(void)
 {
+    print_stack_info();
+
     enable_processor_faults(1, 1, 1);
 
     init_scheduler_stack(SCHED_STACK_START);

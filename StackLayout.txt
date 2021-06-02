@@ -1,0 +1,28 @@
+Stack and Memory Layout
+    What's confusing about how this project is laid out is how the memory is described. SRAM start is
+0x20000000 and SRAM end is 0x20020000, which starts with lower address and ENDS at higher address. Then
+the "stack" start at the end of SRAM, address 0x20020000 and grow DOWNWARDS in full descending fashion.
+Stacks are divided into 1KB or 1024b blocks, with task1 being the first. So task2's address is a lower number
+than stack1, stack3's lower than stack2, stack4's lower than stack3, and scheduler stack being on the end 
+with the lowest numbered address.
+
+SRAM_END 0x20020000         _________________________________________________
+                           |                                                 |
+                           |                  task one 1KB                   |
+                           |                                                 |
+Task2 start 0x2001fc00     ---------------------------------------------------
+                           |                                                 |
+                           |                 task two 1KB                    |
+                           |                                                 |
+Task3 start 0x2001f800     ---------------------------------------------------
+                           |                                                 |
+                           |                 task three 1KB                  |
+                           |                                                 |
+Task4 start 0x2001f400     ---------------------------------------------------
+                           |                                                 |
+                           |                 task four 1KB                   |
+                           |                                                 |
+Sched start 0x2001f000     ---------------------------------------------------
+                           |                                                 |
+                           |             Scheduler Stack 1KB                 |
+                           |_________________________________________________|
