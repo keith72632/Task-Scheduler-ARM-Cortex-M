@@ -27,6 +27,7 @@
 
 extern uint32_t task_handlers[];
 extern uint32_t psp_of_task[];
+uint8_t current_task = 0; //task1 is running
 
 
 void task1_handler(void);
@@ -90,53 +91,8 @@ void task3_handler(void)
 void task4_handler(void)
 {
     while(1)
-    { 
+    {
         printf("Task 4\n");
     }
 }
 
-void SysTick_Handler(void)
-{
-
-}
-
-void init_systick_timer(uint32_t tick_hz)
-{
-    //Systick reload value register
-    uint32_t *pSRVR = (uint32_t *)0xE000E014;
-    uint32_t *pSCVR = (uint32_t *)0xE000E010;
-    uint32_t count_value = (SYSTICK_TIM_CLK/tick_hz) -1;
-
-    //clear value of SVR
-    *pSRVR &= ~(0xffffffff);
-
-    //load value into SVR
-    *pSRVR |= count_value;
-
-    //do some setting in SYST_CVR 
-    *pSCVR |= (1 << 1) | (1 << 2); //enables systick exception request and indicates clock source, respectivley.
-
-    //enables systick
-    *pSCVR |= (1 << 0); //enable systick
-}
-
-uint8_t current_task = 0; //task1 is running
-
-uint8_t get_psp_value(void)
-{
-	return psp_of_task[current_task];
-}
-
-__attribute__((naked)) void switch_sp_to_psp(void)
-{
-	//initialize the psp with task1 stack start
-	__asm volatile("PUSH {LR}"); //save lr value incase other functions corrupt it
-	__asm volatile("BL get_psp_value"); // Branch with link. this is why is saved the lr
-	__asm volatile("MSR PSP,R0");// value in get_psp_value returned as r0. init psp
-	__asm volatile("POP {LR}"); //resume lr
-
-	//change sp to psp
-	__asm volatile("MOV R0,0x02");
-	__asm volatile("MSR CONTROL,R0");
-	__asm volatile("BX LR");
-}

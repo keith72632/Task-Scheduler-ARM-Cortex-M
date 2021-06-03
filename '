@@ -36,18 +36,3 @@ Systick Programming
     Processory clock for Cortext m defualt is 16mhz. Systick timer count is 16MHz. 1 millisecond is KHz in 
 frequency domain. To bring timer count clock from 16MHz to 1KHz, use divisor(reload value). 16MHz(16000000) /
 16000 count or "reload" value == 1000Hz or 1KHz. Count value is what is fed to systick timer.  
-    Systick Reload Value Register (SYST_RVR) specifies the start value to load into the Systick Control
-Value Register(SYST_CVR). Regsiter summary in Programmer Manual. Value loaded from RVR into CVR. CVR counts 
-down and when 0, gets value from RVR again. Systick exception isn't invoked when CVR reaches zero, but rather
-when new value is reloaded. So always store N - 1 count. 
-
-Stacks
-    Each task can consume 1KB of memory as a private stack. Stack is used to hold varaibles and context.
-When a task is getting scheduled for the first time, it doesn't have any context, So the programmer should store
-dummy SF1 and SF2 in task's stack area as part of "task initialization" sequence before launching the scheduler. For 
-dummy data, keep task1 regiseter as 0 and task2 as 1 and so on. XPSR should always at least be 0x01000000 for Tbit.
-PC should be address of next task handler. LR should be EXC_RETURN. There are many EXC_RETURN values, such as:
-0xfffffff1 which returns in handler mode, 0xfffffff9 for return to thread mode and use msp, and 0xfffffffd for
-return to thread mode using psp. In the case of context switching, use 0xfffffffd which returns psp. 
-**Can't use push and pop instructions in handlers, unless intentionally trying to access MSP. Handler 
-    mode always uses MSP, so don't use instruction that affect MSP when using PSP

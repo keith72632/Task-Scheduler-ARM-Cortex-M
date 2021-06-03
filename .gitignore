@@ -1,0 +1,6 @@
+.metadata/
+progManual.pdf
+task_scheduler/.cproject
+task_scheduler/.project
+task_scheduler/.settings/
+task_scheduler/task_scheduler.launch

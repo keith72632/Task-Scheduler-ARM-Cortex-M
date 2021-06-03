@@ -8,12 +8,15 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "main.h"
+#include "stack.h"
 
 //all addresses of stack starts. These are unsigned ints, so must be cast to pointers
 uint32_t psp_of_task[MAX_TASKS] = {T1_STACK_START, T2_STACK_START, T3_STACK_START, T4_STACK_START};
 
 //all handlers
 uint32_t task_handlers[MAX_TASKS];
+
+extern uint8_t current_task;
 
 
 __attribute__((naked)) void init_scheduler_stack(uint32_t scheduler_stack_start)
@@ -39,7 +42,7 @@ void init_task_stack(void)
         pPSP--;
         *pPSP = 0x01000000;
 
-        //PC. Address of task handler
+        //PC. Address of task handler. Must be odd
         pPSP--;
         *pPSP = task_handlers[i];
         printf("Return address of task%d handler(PC): %lx\n\n", i+1, *pPSP); 
@@ -74,3 +77,28 @@ void print_stack_info()
     printf("Scheduler task start    : %x\n", SCHED_STACK_START);
 
 }
+
+__attribute__((naked)) void switch_sp_to_psp(void)
+{
+	//initialize the psp with task1 stack start
+	__asm volatile("PUSH {LR}"); //save lr value incase other functions corrupt it
+	__asm volatile("BL get_psp_value"); // Branch with link. this is why is saved the lr
+	__asm volatile("MSR PSP,R0");// value in get_psp_value returned as r0. init psp
+	__asm volatile("POP {LR}"); //resume lr
+
+	//change sp to psp
+	__asm volatile("MOV R0,0x02");
+	__asm volatile("MSR CONTROL,R0");
+	__asm volatile("BX LR");
+}
+
+uint32_t get_psp_value(void)
+{
+	return psp_of_task[current_task];
+}
+
+void save_psp_value(uint32_t current_psp_value)
+{
+    psp_of_task[current_task] = current_psp_value;
+}
+
