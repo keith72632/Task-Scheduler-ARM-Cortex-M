@@ -51,3 +51,7 @@ PC should be address of next task handler. LR should be EXC_RETURN. There are ma
 return to thread mode using psp. In the case of context switching, use 0xfffffffd which returns psp. 
 **Can't use push and pop instructions in handlers, unless intentionally trying to access MSP. Handler 
     mode always uses MSP, so don't use instruction that affect MSP when using PSP
+
+Blocking States for Tasks
+    When a task has nothing to do, it should call delay function. Tasks should have two states, running and blocked. 
+Scheduler should unblock states if their blocking period is over and put them back into running state

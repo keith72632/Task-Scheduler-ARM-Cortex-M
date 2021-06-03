@@ -32,3 +32,37 @@ and then r0 through r12 as a dummy value. The pointer should now be decrememnted
 6.Led lights. Start RccAHB1enr clock for correct pins. Set Gpio mode for pins. These are two bit regitsers,
 so one option is to left shift pin number * 2. It's best to wrap these in an init function. Energize pins
 in another function. Can also #if 0 and energize within init. De-energize pins before leaving init function.
+
+7.The SysTick timer is the operative part of a Round-Robin RTOS. The Systick peripheral has two important
+register; the Systick Control regsiter and the Systick Reload register. First load the Reload Register 
+with the count value. The count value is cpu clock time (16MHz or 16000000) divided by the number of Hz in
+a tick (1000). which equals 16000. Load this value into the Reload Register. Next, enable Systick with Control
+Register by setting certain bits. TICKINT, or bit[1], is the Systick exception request enable, and bit[2], or
+CLKSOURCE indicates: 0 = AHB/8 and 1 = AHB (processor clock). After these two settings are configured, enable
+Systick counter by setting bit[0] to one in the Control Register. 
+
+8. Create a Systick Handler. Assign naked attribute. The purpose of this handler is to save the context of the
+current task's stack and retrive the contents of the next task's stack. Start off by moving(MRS) the contents
+of psp into r0. When a handler is called, r0 through r3, r12, lr, pc and xpsr are already pushed to memory. For
+the current task to have access to register r4 through r11 aswell, they will need to be created. Pushing and
+popping won't work for these registers because those intructions will add and remove to the msp, So instead,
+use a Store instruction. Storing one register at a time with STR will work, but a faster way is to use
+Store Multiple and Decrement Before, or STMDB. Syntax as follows: STMDB R0!, {R4-R11}. 
+
+8b. Create a couple of helper functions. A function to save psp value and one to get psp value. The psp, or
+r0, will need to be passed to the save psp function, so make sure the save psp helper function takes one
+argument. Saving this can be accomplished in mutliple fashions, but the best is to refernce the array of 
+psp addresses, and save r0 to it by using array_of_psp[i] = r0. Next create a get psp heler function, which
+returns the psp. Using the previous example, just use: return array_of_psp[i];
+
+8c. Back in Systick handler after line where r4-r11 are stored with STMDB, branch to save psp function
+by using: BL save_psp_value. After it returns, it's time to retrieve state from next task. Update the current 
+task counter by incrementing, and to ensure the counter never goes out of range of number of tasks, use
+counter %= MAX_TASKS. Now get psp value by branching to get psp value function from before. This will return
+the next psp as r0. Now load registers registers r4-r11 from memory using Load Multiple Decrement After, or
+LDMIA. Move r0 value, which is the desired psp address, into PSP using MSR. This function is complete, but 
+since naked, use BX LR to return
+
+8d. **********************important******************. Before Calling helper functions in a naked C function,
+like previously in Systick Handler, the LR must be saved so not to be corrupt. Push before calling functions and
+pop when finished. Syntax: PUSH {LR} and POP {LR} 

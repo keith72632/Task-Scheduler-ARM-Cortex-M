@@ -72,9 +72,9 @@ void task1_handler(void)
     while(1)
     {
         led_on(LED_GREEN);
-        delay(DELAY_COUNT_1S);
+        delay(DELAY_COUNT_250MS);
         led_off(LED_GREEN);
-        delay(DELAY_COUNT_1S);
+        delay(DELAY_COUNT_250MS);
     }
 }
 
@@ -105,9 +105,9 @@ void task4_handler(void)
     while(1)
     {
         led_on(LED_RED);
-        delay(DELAY_COUNT_1S);
+        delay(DELAY_COUNT_125MS);
         led_off(LED_RED);
-        delay(DELAY_COUNT_1S);
+        delay(DELAY_COUNT_125MS);
     }
 }
 
