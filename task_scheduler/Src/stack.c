@@ -23,7 +23,7 @@ __attribute__((naked)) void init_scheduler_stack(uint32_t scheduler_stack_start)
 {
     //first argument passed to this function is r0
     //__asm volatile("MSR MSP,R0");
-    __asm volatile ("MSR MSP,R0": : "r"(scheduler_stack_start) : );
+    __asm volatile ("MSR MSP,%0": : "r"(scheduler_stack_start) : );
     //Branch indirect back to main, which is stored in LR
     __asm volatile ("BX LR");
 }

@@ -1,0 +1,34 @@
+Process of Creating Round Robin RTOS
+
+1. Establish a memory layout. Each task and the scheduler will have it's own stack i.e. location 
+in memory (SRAM or static RAM). In the case for the ARM Coretx-m processor, SRAM starts at 0x20000000.
+Calculate the end of SRAM by adding the size of task block and scheduler block to 0x20000000. Since ARM
+uses full descending stack principles, the first task will start at SRAM end and "grow downwards". It's
+good to store the address of each task start and scheduler start as macros in an array.  
+
+2. Enable faults. This is imperative in a RTOS because of the frequent switching of stack pointers.
+Faults are enabled by selecting the enable bits in the System Handler Control and Status Register(SHCSR).
+
+3.Initialize the stack of the scheduler first. Move the starting address of the scheduler stack into the
+MSP register. Best way is to create a naked C wrapper function, and inside using inline assembly MSR R0,
+which is the first argument passed into naked C function, INTO MSP register. There are a couple different ways
+to do this. The first and simpler way is to take advantage of the naked function atribute and just use
+__asm volatile("MSR MSP,R0");. As mentioned before, this way is simpler but CAN cause problems later if R0 
+is corrupted somehow. The best way is to pass a scheduler stack start to naked C function as argument, and 
+use __asm volatile("MSR MSP,%0", : : "r"(sched_stack_start) : );. Use LR to return from naked C function by
+using __asm volatile("BX LR");
+
+4.Each Task will have a task handler, sort of like an exception or interrupt. It's best to keep the
+addresses of each task handler function in an array for easy access later. Manually add each function to 
+array. array_of_handler[i] = task_hander; will add the address.
+
+5.Create stack for each task. Each stack will have r0 through r3, r12, lr, pc and xpsr automatically
+created, but nothing assigned. r4 through r11 will have to be created. Create a pointer variable and 
+assign it the address of the first task. This can be an address literal, a macro, or like mentioned above, 
+an item in an array. Decrement the pointer and assign appropriate value after each decrememnt. XPSR =
+0x01000000, PC=address of respective task handler, LR = 0xfffffffd for return to thread mode with psp,
+and then r0 through r12 as a dummy value. The pointer should now be decrememnted 16 times. Store value of psp. 
+
+6.Led lights. Start RccAHB1enr clock for correct pins. Set Gpio mode for pins. These are two bit regitsers,
+so one option is to left shift pin number * 2. It's best to wrap these in an init function. Energize pins
+in another function. Can also #if 0 and energize within init. De-energize pins before leaving init function.

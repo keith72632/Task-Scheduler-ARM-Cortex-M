@@ -33,10 +33,10 @@ void led_init_all(void)
 #if 0
 	printf("First run\n");
 	//configure the outputtype
-	*pGpioOpTypeReg |= ( 1 << (2 * LED_GREEN));
-	*pGpioOpTypeReg |= ( 1 << (2 * LED_ORANGE));
-	*pGpioOpTypeReg |= ( 1 << (2 * LED_RED));
-	*pGpioOpTypeReg |= ( 1 << (2 * LED_BLUE));
+	*pGpioOpTypeReg |= ( 1 << LED_GREEN);
+	*pGpioOpTypeReg |= ( 1 << LED_ORANGE);
+	*pGpioOpTypeReg |= ( 1 << LED_RED);
+	*pGpioOpTypeReg |= ( 1 << LED_BLUE);
 #endif
 
     led_off(LED_GREEN);
