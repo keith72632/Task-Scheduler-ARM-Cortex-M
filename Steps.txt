@@ -66,3 +66,12 @@ since naked, use BX LR to return
 8d. **********************important******************. Before Calling helper functions in a naked C function,
 like previously in Systick Handler, the LR must be saved so not to be corrupt. Push before calling functions and
 pop when finished. Syntax: PUSH {LR} and POP {LR} 
+
+9. Create struct for task control for Blocking. Blocking is a method of controlling tasks that a more time senstive.
+Less dependecny on timing, since there is a small delay bewteen switching context. The structure created will replace 
+the array of PSPs and the array of task handler addresses. create a a new type struct called TCB_t. This struct will
+hold the psp value, the block count, the current state which is essentially an 8bit boolean that states wether the
+task is running or blocked, and a function pointer to task handler. Initialize this struct by either wrapping in a 
+function or jsut in the task init function. Create a global TCB_t user_tasks[MAX_TASKS] array. Initialize all
+tasks to running, each user task it's psp value (user_tasks[i].task_handler = taskX_handler). Any function assigning
+values to the previous arrays for the psp and task handlers will need to be changed. 

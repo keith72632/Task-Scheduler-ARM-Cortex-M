@@ -26,3 +26,29 @@ Sched start 0x2001f000     ---------------------------------------------------
                            |                                                 |
                            |             Scheduler Stack 1KB                 |
                            |_________________________________________________|
+
+Initializing PSP for tasks
+    XPSR
+    PC
+    LR
+    R12
+    R3
+    R2
+    R1 
+    R0
+    call init psp
+        *pPtr = addr of psp(8)
+        
+        pPtr--
+        *pPtr = XPRS(7)
+        
+        pPtr--
+        *pPtr = PC(6)
+
+        pPtr--;
+        *pPrt = LR(5)
+
+        pPtr--;
+        *pPtr = R12(4)
+
+        etc...

@@ -26,8 +26,6 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-extern uint32_t task_handlers[];
-extern uint32_t psp_of_task[];
 uint8_t current_task = 0; //task1 is running
 
 
@@ -46,13 +44,6 @@ int main(void)
     enable_processor_faults(1, 1, 1);
 
     init_scheduler_stack(SCHED_STACK_START);
-
-    //creating addray of handlers
-    task_handlers[0] = (uint32_t)task1_handler;
-    task_handlers[1] = (uint32_t)task2_handler;
-    task_handlers[2] = (uint32_t)task3_handler;
-    task_handlers[3] = (uint32_t)task4_handler;
-
 
     init_task_stack();
 

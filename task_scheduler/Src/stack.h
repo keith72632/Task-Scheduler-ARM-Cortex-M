@@ -8,6 +8,17 @@
 #ifndef STACK_H_
 #define STACK_H_
 
+#define TASK_RUNNING_STATE 0x00
+#define TASK_BLOCKED_STATE 0xFF
+
+//task control block
+typedef struct {
+    uint32_t psp_value;
+    uint32_t block_count;
+    uint8_t current_state;
+    void (*task_handler)(void);
+}TCB_t;
+
 __attribute__((naked)) void init_scheduler_stack(uint32_t scheduler_stack_start);
 void init_task_stack();
 void print_stack_info();
