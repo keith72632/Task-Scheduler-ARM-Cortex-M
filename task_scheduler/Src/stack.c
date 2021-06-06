@@ -52,30 +52,39 @@ void init_task_stack(void)
 	{
         //initialize pPSP to addr of each task. should be 0x400 or 1024 KB apart
 		pPSP = (uint32_t *)user_tasks[i].psp_value;
-        printf("Task%d PSP intialized address: %p\n\n", i+1, pPSP);
+        printf("Task%d PSP intialized address: %p\n", i+1, pPSP);
+        printf("Task%d *PSP(psp): %p\n", i+1, pPSP);
 
         //XPSR
         pPSP--;
         *pPSP = 0x01000000;
+        printf("Task%d *PSP(xpsr): %lx\n", i+1, *pPSP);
+
 
         //PC. Address of task handler. Must be odd
         pPSP--;
         *pPSP = (uint32_t *)user_tasks[i].task_handler;
-        printf("Return address of task%d handler(PC): %lx\n\n", i+1, *pPSP); 
+        //printf("Return address of task%d handler(PC): %lx\n\n", i+1, *pPSP); 
+        printf("Task%d *PSP(pc: address of task handler): %p\n", i+1, user_tasks[i].task_handler);
 
         //LR
         pPSP--;
         *pPSP = 0xfffffffd;
+        printf("Task%d *PSP(lr): %lx\n", i+1, *pPSP);
+
 
         //r0 through r12
         for(int j = 0; j < 13; j++)
         {
             pPSP--;
             *pPSP = i;
+            printf("%d *PSP(r%d): %lx. Address of r%d: %p\n", i, j, *pPSP, j, pPSP);
+            
         }
 
         //store value of psp
         user_tasks[i].psp_value = (uint32_t)pPSP;
+        printf("Task%d *PSP(value of psp being stored): %lx\n\n", i+1, user_tasks[i].psp_value);
 	}
 }
 

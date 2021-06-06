@@ -1,0 +1,91 @@
+***Memory Mapped Registers***
+***All of these are found in the prgrammers guide***
+Reset Clock Control (RCC)
+    At address 0x40023800 - 0x40023BFF. In an attempt to reduce power consuption, periheral clocks
+(like RCC) are powered off until needed. There are two registers used to switch on clocks, RCC_AHB1ENR
+and RCC_AHB2ENR for hardware and APB for the peripheral clock, named relative to the buses they use.
+Clocks: system clock, Advanced High Performance Bus (AHB), Low Speed Advanced Peripheral Bus(AHB1)
+and High Speed Advanced Peripheral Bus (AHB2). ALl of these are derived from the system clock
+
+System Control Block (SCB)
+    SCB handles all processes internal to processor, like Systick, System COntrol registers like, Config 
+and control register, or the NVIC
+    This handles internal interruts, refered to as "exception". These exceptions, like Hard Fault and
+Reset have higher priority than the external interrupts, or IRQs. Note about reset handler, at address 
+0x00000004 and is the first thing called. On reset, PC reads value from 0x00000000 and "loads" into 
+MSP, or Main Stack Pointer. Then the MSP is moved to address of Resest Handler, 0x00000004
+
+System Handler Control and State Register(SHCSR)
+    Enables system fault handlers, like SVC, MemMange, Usage, and bus faults. write one to the enable
+registers to enable. 
+
+Usage Fault Status Regitser(USFR) Bus Fault Status Register(BSFR) Memory Manage Fault Status Register(MMFSR)
+    These registers are for displaying the type a fault with each type of fault. 
+
+Interrupt Control and State Register (ICSR)
+    Privileged required. Provide a set-pending bit for the NMI, and set-pending and clear-pending bits
+for PendSVC and SysTick excepptions. The ICSR indicates the exception number of exception being processed,
+wether there are preemptive active exceptions, the exception number of the highest priority exception currently
+pended, and wether any interrupts are pending. 
+
+Nested Vector Interrut Controller (NVIC)
+    The NVIC is an external engine used to handle external interrupts, or IRQs. From here you can 
+enable, pend or clear interrupts. Interrut Set-Pend Register or ISPR is used to pend, Interrupt 
+Set-Enable Register or ISER is used to enable interrupt, and Interrupt Set-Clear Register or ISCR
+is used to clear interrupt. There is also an Interrut Priority Register, or IPR, whose job it is to 
+"prioritize" interruts. System exceptions are in the negavives, which means higher priority, and the 
+external interrupts are ranked 0 - 16 in STM32F4xx's case, reducing in priority as number increases.
+
+Interrupt Set-Enable Register(ISER) Interrput Clear-Enable Register(ICER) Interrupt Set-Pending Register (ISPR)
+    All of these are included in the NVIC. ISPR will pend the register and the ISER will invoke the exception/interrupt.
+Each of these registers contains 32 bits, so if invoking IRQ higher than 31, must use ISER1 for example. Best way is to use
+1 << IRQ_NO % 32 if irq number is above 31 and below 64. 
+
+Configuartion and Control Register (CCR)
+    Addr = 0xE000ED14. This register permanently enables stack alignment and causes unaligned accesses to result in a 
+Hard Fault. In Cortex M4,  
+
+General Purpose Input Output (GPIOx)
+    These registeres are used to configure the GPIO pins. Each GPIO pin has its own set of registers,
+first and most importantly the MODE register. This 32 bit register has two bits for every pin to configure
+the in for certain functions like input(0), output(1), alternate function(10), and analog(11). Note, 
+alternate is used for things like UART and USART
+
+Universal Asynchronous Reciever/Transmitter (UART)
+    A form of serial communication. Used to send data a bit at a time through a wire. As the name 
+implies, this is asynchronous, which means a single byte is sent at a time, where as Usart(Univeral
+Synchronous/Asynchronous Receiver/Transmitter) can do one byte or whole block. Uart incorporates start 
+and stop bits. The data is placed between these two bits in a process known as "framing". The start bit
+is one bit which is alway 0, while the stop bit can be one or two bits, with the value always being one.
+Some systems require something called a "parity bit", placed on the end, which retains integrity of 
+data being sent. The speed at which this data is tranfered is called a baud rate. Ex. 
+1,000,000/baudrate = time is takes to send the 1,000,000 bits. Most MCUs have more than one UART. Two
+rgisters are used to set the baud rate, integer baudrate divisor and fraction baudrate divisor. To
+get desired baudrate, use SystemClk/(16 * ClkDiv). Clkdiv is value loaded into divisor register.
+Steps to configure include: 
+    1)Provide a clock to uart by writing 1 to corresponding uart clock gating register
+    2)Provide clock to gpio pin used for data tranfer. Mode = Alternate Function
+    3)Disable uart by writing 0 to uart control register
+    4)Write the integer portion of the Baudrate to the UARTIBRD register.
+    5)Write the fractional portion of the Baudrate to the UARTFBRD register.
+    6)Select the system clock as UART clock source
+
+SysTick Registers
+    Systick has its own set of registers to handle it's processes. The control register(STK_CTRL)
+has three primary registers. Enable, Tickint, and clksource. Enable is what actaully enables the 
+counter, tick int insures the interrupt happens at count 0, and clock source signifies which bus
+is being used. There is also a system reload register. what is loaded into this register is used 
+to calculate the reload value. Probaly 16000
+
+***Special Register***
+*These are register that are not memory mapped
+
+Control Register
+    Used to control things like: The stack being used (MSP or PSP) by setting the SPSEL bit, the privilege
+level by setting the nPRIV bit, and wether the FPU state is active. Note, when in thread mode and going from 
+privilege to unprivileged, the processor cannot go back unless an interrupt is called, sending processor 
+into handler mode. 
+
+Link Register (r14)
+    Stores the return addresses of subroutines, function calls and exceptions. On reset, LR is loaded
+with the value 0xffffffff.

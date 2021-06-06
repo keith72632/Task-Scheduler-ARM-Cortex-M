@@ -60,6 +60,7 @@ int main(void)
 
 void task1_handler(void)
 {
+	printf("Address of task1_handler: %p\n", task1_handler);
     while(1)
     {
         led_on(LED_GREEN);
