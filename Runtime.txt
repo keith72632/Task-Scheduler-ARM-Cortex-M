@@ -1,0 +1,9 @@
+Flow of Program in Runtime
+
+1. Enable Processor faults for Bus, MemManage, and Usage
+2. Initialize Stack for scheduler. This will be MSP
+3. Initialize stack for tasks in 1024 byte sections
+4. Initalize LED lights. Set clock, mode(output) and data for onbaord pins
+5. Initialize timer by loading the value into Reload register. Calculate this value by taking 
+   processor time (16MHz) divided by number of ticks(1000)
+6.Enable systick by setting bit 0, 1 and 2 in control register. 

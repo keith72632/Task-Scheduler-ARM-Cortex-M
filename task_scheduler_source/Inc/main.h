@@ -41,4 +41,13 @@
 
 #define INTERRUPT_ENABLE()  do{__asm volatile ("MOV R0,#0x0"); asm volatile("MSR PRIMASK,R0"); } while(0)
 
+/* This is a task control block carries private information of each task */
+typedef struct
+{
+	uint32_t psp_value;
+	uint32_t block_count;
+	uint8_t  current_state;
+	void (*task_handler)(void);
+}TCB_t;
+
 #endif /* MAIN_H_ */
