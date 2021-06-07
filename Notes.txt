@@ -55,3 +55,11 @@ return to thread mode using psp. In the case of context switching, use 0xfffffff
 Blocking States for Tasks
     When a task has nothing to do, it should call delay function. Tasks should have two states, running and blocked. 
 Scheduler should unblock states if their blocking period is over and put them back into running state. 
+
+Blocking for GIven number of ticks
+     Idle task should be implimented incase all tasks are blocked. The idle task is essentially a user task. 
+First thing is to make task_delay
+
+PendSV Handler
+    A lot of what is in the Systick Handler needs to be offloaded to the PendSV Handler. Systick will 
+still update the gloabl tick count, unblock tasks, and pend Pendsv.

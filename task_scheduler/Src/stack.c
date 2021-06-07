@@ -11,6 +11,7 @@
 #include "stack.h"
 
 TCB_t user_tasks[MAX_TASKS];
+extern uint32_t g_tick_count;
 
 extern uint8_t current_task;
 
@@ -30,21 +31,25 @@ __attribute__((naked)) void init_scheduler_stack(uint32_t scheduler_stack_start)
 
 void init_task_stack(void)
 {
-    user_tasks[0].current_state = TASK_RUNNING_STATE;
-    user_tasks[1].current_state = TASK_RUNNING_STATE;
-    user_tasks[2].current_state = TASK_RUNNING_STATE;
-    user_tasks[3].current_state = TASK_RUNNING_STATE;
+    //task 0 is idle task and always in run state
+    user_tasks[0].current_state = TASK_READY_STATE;
+    user_tasks[1].current_state = TASK_READY_STATE;
+    user_tasks[2].current_state = TASK_READY_STATE;
+    user_tasks[3].current_state = TASK_READY_STATE;
+    user_tasks[4].current_state = TASK_READY_STATE;
 
     //Addresses of each task's psp
-    user_tasks[0].psp_value = T1_STACK_START;
-    user_tasks[1].psp_value = T2_STACK_START;
-    user_tasks[2].psp_value = T3_STACK_START;
-    user_tasks[3].psp_value = T4_STACK_START;
+    user_tasks[0].psp_value = IDLE_STACK_START;
+    user_tasks[1].psp_value = T1_STACK_START;
+    user_tasks[2].psp_value = T2_STACK_START;
+    user_tasks[3].psp_value = T3_STACK_START;
+    user_tasks[4].psp_value = T4_STACK_START;
 
-    user_tasks[0].task_handler = task1_handler;
-    user_tasks[1].task_handler = task2_handler;
-    user_tasks[2].task_handler = task3_handler;
-    user_tasks[3].task_handler = task4_handler;
+    user_tasks[0].task_handler = idle_task;
+    user_tasks[1].task_handler = task1_handler;
+    user_tasks[2].task_handler = task2_handler;
+    user_tasks[3].task_handler = task3_handler;
+    user_tasks[4].task_handler = task4_handler;
 
 	uint32_t *pPSP;
 	//loop through pPSP and assign register value

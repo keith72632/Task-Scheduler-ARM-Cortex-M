@@ -8,7 +8,7 @@
 #ifndef STACK_H_
 #define STACK_H_
 
-#define TASK_RUNNING_STATE 0x00
+#define TASK_READY_STATE 0x00
 #define TASK_BLOCKED_STATE 0xFF
 
 //task control block

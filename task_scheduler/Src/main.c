@@ -21,18 +21,23 @@
 #include "stack.h"
 #include "faults.h"
 #include "led.h"
+#include "systick.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-uint8_t current_task = 0; //task1 is running
+//Changed to 1 since adding idle task to first elemtn is user_tasks array
+uint8_t current_task = 1; //task1 is running
+uint32_t g_tick_count = 0;
 
 
 void task1_handler(void);
 void task2_handler(void);
 void task3_handler(void);
 void task4_handler(void);
+void idle_task();
+
 
 void init_systick_timer(uint32_t tick_hz);
 void switch_sp_to_psp(void);
@@ -60,13 +65,12 @@ int main(void)
 
 void task1_handler(void)
 {
-	printf("Address of task1_handler: %p\n", task1_handler);
     while(1)
     {
         led_on(LED_GREEN);
-        delay(DELAY_COUNT_250MS);
+        task_delay(1000);
         led_off(LED_GREEN);
-        delay(DELAY_COUNT_250MS);
+        task_delay(1000);
     }
 }
 
@@ -75,9 +79,9 @@ void task2_handler(void)
     while(1)
     {
         led_on(LED_ORANGE);
-        delay(2 *DELAY_COUNT_1S);
+        task_delay(500);
         led_off(LED_ORANGE);
-        delay(2 *DELAY_COUNT_1S);
+        task_delay(500);
     }
 }
 
@@ -86,9 +90,9 @@ void task3_handler(void)
     while(1)
     {
         led_on(LED_BLUE);
-        delay(DELAY_COUNT_1S);
+        task_delay(250);
         led_off(LED_BLUE);
-        delay(DELAY_COUNT_1S);
+        task_delay(250);
     }
 }
 
@@ -97,9 +101,13 @@ void task4_handler(void)
     while(1)
     {
         led_on(LED_RED);
-        delay(DELAY_COUNT_125MS);
+        task_delay(150);
         led_off(LED_RED);
-        delay(DELAY_COUNT_125MS);
+        task_delay(150);
     }
 }
 
+void idle_task()
+{
+    while(1);
+}
