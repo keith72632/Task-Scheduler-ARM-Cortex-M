@@ -8,10 +8,12 @@
 
 #include <stdint.h>
 #include "main.h"
+#include "registers.h"
 
 extern uint8_t current_task;
 extern uint32_t g_tick_count;
 extern TCB_t user_tasks[MAX_TASKS];
+extern SCB_t *SCB;
 
 void update_global_tick_count(void);
 void unblock_tasks(void);
@@ -44,14 +46,14 @@ void init_systick_timer(uint32_t tick_hz)
 void  SysTick_Handler(void)
 {
 
-	uint32_t *pICSR = (uint32_t*)0xE000ED04;
+	//uint32_t *pICSR = (uint32_t*)0xE000ED04;
 
     update_global_tick_count();
 	//checks if there are any blocked tasks that qualify for running state
     unblock_tasks();
 
     //pend the pendsv exception
-    *pICSR |= ( 1 << 28);
+    SCB->ICSR |= ( 1 << 28);
 }
 
 

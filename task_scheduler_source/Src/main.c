@@ -27,6 +27,7 @@
 #include "led.h"
 #include "psp.h"
 #include "faults.h"
+#include "registers.h"
 
 
 /* task handler function prototypes */
@@ -57,6 +58,9 @@ uint32_t g_tick_count = 0;
 /* Each task has its own TCB */
 TCB_t user_tasks[MAX_TASKS];
 
+//Registers
+SCB_t* SCB = (SCB_t*)SCB_BASE;
+
 int main(void)
 {
 
@@ -77,6 +81,13 @@ int main(void)
 	for(;;);
 }
 
+void gen_mem_manage(void)
+{
+	uint32_t *pPtr = (uint32_t *)0x40000000;
+	void(*address)(void);
+	address = (void *)pPtr;
+	address();
+}
 
 void idle_task(void)
 {
@@ -123,6 +134,7 @@ void task3_handler(void)
 void task4_handler(void)
 
 {
+	gen_mem_manage();
 	while(1)
 	{
 		led_on(LED_RED);
