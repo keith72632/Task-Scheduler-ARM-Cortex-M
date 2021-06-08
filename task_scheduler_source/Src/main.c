@@ -81,6 +81,15 @@ int main(void)
 	for(;;);
 }
 
+void gen_usage_fault(void)
+{
+	uint32_t *pSRAM = (uint32_t *)0x20010000;
+	*pSRAM = 0xffffffff;
+	void(*address)(void);
+	address = (void *)0x20010001;
+	address();
+}
+
 void gen_mem_manage(void)
 {
 	uint32_t *pPtr = (uint32_t *)0x40000000;
@@ -88,6 +97,8 @@ void gen_mem_manage(void)
 	address = (void *)pPtr;
 	address();
 }
+
+
 
 void idle_task(void)
 {
