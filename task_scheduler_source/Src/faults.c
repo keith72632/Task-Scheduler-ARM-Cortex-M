@@ -80,12 +80,21 @@ __attribute__((naked)) void UsageFault_Handler(void)
 	__asm ("MRS R0,MSP");
 	__asm ("B UsageFault_Handler_C");
 }
-void UsageFault_Handler_C(uint32_t *pBaseStackFrame)
+void UsageFault_Handler_C(uint32_t *stack)
 {
 	//uint32_t *pUFSR = (uint32_t *)0xe000ed2a;
 	printf("Exception: UsageFault\n");
 	printf("SCB->MMSR Address = %p\n", &SCB->CFSR);
 	printf("UFSR = %lx\n", (SCB->CFSR) & 0xffff0000);
-	printf("MSP = %p\n", pBaseStackFrame);
+#if 0
+	printf("R0(MSP) = %lx\n", *stack);
+	printf("R1      = %lx\n", *(stack + 1));
+	printf("R2      = %lx\n", *(stack + 2));
+	printf("R3      = %lx\n", *(stack + 3));
+	printf("R12     = %lx\n", *(stack + 4));
+	printf("LR      = %lx\n", *(stack + 5)); //0xfffffffd. Return to thread with MSP
+	printf("PC      = %lx\n", *(stack + 6)); //Location of fault
+	printf("XPSR    = %lx\n", *(stack + 7));
+#endif
 	while(1);
 }

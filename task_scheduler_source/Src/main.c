@@ -48,18 +48,18 @@ void task_delay(uint32_t tick_count);
 
 
 /* This variable tracks the current_task being executed on the CPU */
-uint8_t current_task = 1; //task1 is running
+extern uint8_t current_task; //task1 is running
 
 /* This variable gets updated from systick handler for every systick interrupt */
-uint32_t g_tick_count = 0;
+extern uint32_t g_tick_count;
 
 
 
 /* Each task has its own TCB */
-TCB_t user_tasks[MAX_TASKS];
+extern TCB_t user_tasks[MAX_TASKS];
 
 //Registers
-SCB_t* SCB = (SCB_t*)SCB_BASE;
+extern SCB_t* SCB;
 
 int main(void)
 {
