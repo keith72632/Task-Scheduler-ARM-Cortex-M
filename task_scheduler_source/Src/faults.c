@@ -50,7 +50,8 @@ __attribute__((naked)) void MemManage_Handler_C(uint32_t *stack)
 {
 	printf("Exception : MemManage\n");
 	//uint32_t *pMMSR = (uint32_t*)0xE000ED28;
-	printf("MMSR = %lx\n", (SCB->MMSR) & 0xffff);
+	printf("SCB->MMSR Address = %p\n", &SCB->CFSR);
+	printf("MMSR = %lx\n", SCB->CFSR & 0xffff);
 	printf("R0 = %p\n", stack);
 	while(1);
 }
@@ -81,9 +82,10 @@ __attribute__((naked)) void UsageFault_Handler(void)
 }
 void UsageFault_Handler_C(uint32_t *pBaseStackFrame)
 {
-	uint32_t *pUFSR = (uint32_t *)0xe000ed2a;
+	//uint32_t *pUFSR = (uint32_t *)0xe000ed2a;
 	printf("Exception: UsageFault\n");
-	printf("UFSR = %lx\n", (*pUFSR) & 0xffff);
+	printf("SCB->MMSR Address = %p\n", &SCB->CFSR);
+	printf("UFSR = %lx\n", (SCB->CFSR) & 0xffff0000);
 	printf("MSP = %p\n", pBaseStackFrame);
 	while(1);
 }

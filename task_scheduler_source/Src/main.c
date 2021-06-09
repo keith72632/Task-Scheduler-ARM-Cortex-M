@@ -145,7 +145,6 @@ void task3_handler(void)
 void task4_handler(void)
 
 {
-	gen_mem_manage();
 	while(1)
 	{
 		led_on(LED_RED);
