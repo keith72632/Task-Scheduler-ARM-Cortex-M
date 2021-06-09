@@ -13,8 +13,8 @@ extern SCB_t *SCB;
 
 void enable_processor_faults(void)
 {
-
-	SCB->SHCSR |= (1 << 16) | (1 << 17) | (1 << 18);
+	/*Usage, Mem and Bus fault, not in order. If disabled and fault is invoked, hardfault*/
+	SCB->SHCSR |= (1 << 16) | (1 << 17); //mem, bus, usage
 	#if 0
 	uint32_t *pSHCSR = (uint32_t*)0xE000ED24;
 
@@ -25,6 +25,8 @@ void enable_processor_faults(void)
 }
 
 //2. implement the fault handlers
+
+/*----------------Hard Fault----------------------*/
 __attribute__((naked)) void HardFault_Handler(void)
 {
 	__asm volatile("MRS R0,MSP");
@@ -39,7 +41,7 @@ void HardFault_Handler_C(uint32_t *stack)
 }
 
 
-//MemManage Fault
+/*--------------MemManage Fault-------------------*/
 __attribute__((naked)) void MemManage_Handler(void)
 {
 	__asm volatile("MRS R0,MSP");
@@ -57,7 +59,7 @@ __attribute__((naked)) void MemManage_Handler_C(uint32_t *stack)
 }
 
 
-//Bus Fault
+/*------------------Bus Fault--------------------*/
 __attribute__((naked)) void BusFault_Handler(void)
 {
 	__asm volatile("MRS R0,MSP");
@@ -74,27 +76,39 @@ void BusFault_Handler_C(uint32_t *stack)
 	while(1);
 }
 
-//Usage fault
+/*-----------------Usage fault--------------------*/
 __attribute__((naked)) void UsageFault_Handler(void)
 {
-	__asm ("MRS R0,MSP");
-	__asm ("B UsageFault_Handler_C");
+	__asm volatile ("MRS r0,MSP");
+	__asm volatile ("B UsageFault_Handler_C");
 }
 void UsageFault_Handler_C(uint32_t *stack)
 {
-	//uint32_t *pUFSR = (uint32_t *)0xe000ed2a;
 	printf("Exception: UsageFault\n");
 	printf("SCB->MMSR Address = %p\n", &SCB->CFSR);
 	printf("UFSR = %lx\n", (SCB->CFSR) & 0xffff0000);
-#if 0
-	printf("R0(MSP) = %lx\n", *stack);
-	printf("R1      = %lx\n", *(stack + 1));
-	printf("R2      = %lx\n", *(stack + 2));
-	printf("R3      = %lx\n", *(stack + 3));
-	printf("R12     = %lx\n", *(stack + 4));
-	printf("LR      = %lx\n", *(stack + 5)); //0xfffffffd. Return to thread with MSP
-	printf("PC      = %lx\n", *(stack + 6)); //Location of fault
-	printf("XPSR    = %lx\n", *(stack + 7));
-#endif
+	printf("MSP Base = %p\n", stack);
+
 	while(1);
 }
+
+/*---------------Fault Generators----------------*/
+void gen_usage_fault(void)
+{
+	uint32_t *pSRAM = (uint32_t *)0x20010000;
+	*pSRAM = 0xffffffff;
+	void(*address)(void);
+	address = (void *)0x20010001;
+	address();
+}
+
+void gen_mem_manage(void)
+{
+	uint32_t *pPtr = (uint32_t *)0x40000000;
+	void(*address)(void);
+	address = (void *)pPtr;
+	address();
+}
+
+
+
