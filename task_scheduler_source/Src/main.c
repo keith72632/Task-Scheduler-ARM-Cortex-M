@@ -29,6 +29,11 @@
 #include "faults.h"
 #include "registers.h"
 #include "tasks.h"
+#include "uart.h"
+
+void usart_init(void);
+void uart_write(uint8_t c);
+void uart_write_string(char s[]);
 
 /* This variable tracks the current_task being executed on the CPU */
 extern uint8_t current_task; //task1 is running
@@ -44,6 +49,7 @@ extern TCB_t user_tasks[MAX_TASKS];
 //Registers
 extern SCB_t* SCB;
 
+
 int main(void)
 {
 
@@ -55,6 +61,8 @@ int main(void)
 
 	led_init_all();
 
+	usart_init();
+
 	init_systick_timer(TICK_HZ);
 
 	switch_sp_to_psp();
@@ -63,3 +71,6 @@ int main(void)
 
 	for(;;);
 }
+
+
+
