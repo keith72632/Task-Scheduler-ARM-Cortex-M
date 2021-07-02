@@ -24,6 +24,11 @@ void usart_init()
     *pAMode |= (2 << 4) | (2 << 6);
     *AltFunc |= (7 << 8) | (7 << 12);
 
+    /* baudrate calculation: 16,000,000/(16 * 9600) = 104.1667
+     * Mantissa = 68
+     * Decimal = 0.1667 * 16 = 3
+     * Brr value = 0x683
+     */
     *pUsart_Brr = 0x0683;
     *pUsart_Cr1 |= (1 << 3) | (1 << 13);
 }
