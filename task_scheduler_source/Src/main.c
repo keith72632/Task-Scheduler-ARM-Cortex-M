@@ -29,7 +29,9 @@
 #include "faults.h"
 #include "registers.h"
 #include "tasks.h"
-#include "uart.h"
+#include "uart_drivers.h"
+#include "spi_drivers.h"
+#include "stm32f407xx.h"
 
 void usart_init(void);
 void uart_write(uint8_t c);
@@ -61,7 +63,9 @@ int main(void)
 
 	led_init_all();
 
-	usart_init();
+	USART_Init(USART2);
+
+	SPI_Init(SPI1);
 
 	init_systick_timer(TICK_HZ);
 
