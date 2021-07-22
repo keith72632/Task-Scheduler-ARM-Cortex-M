@@ -51,27 +51,30 @@ extern TCB_t user_tasks[MAX_TASKS];
 //Registers
 extern SCB_t* SCB;
 
-
-int main(void)
+void OS_KernelInit()
 {
-
 	enable_processor_faults();
 
 	init_scheduler_stack(SCHED_STACK_START);
 
 	init_tasks_stack();
 
+	init_systick_timer(TICK_HZ);
+
+	switch_sp_to_psp();
+
+	task1_handler();
+}
+
+int main(void)
+{
 	led_init_all();
 
 	USART_Init(USART2);
 
 	SPI_Init(SPI1);
 
-	init_systick_timer(TICK_HZ);
-
-	switch_sp_to_psp();
-
-	task1_handler();
+	OS_KernelInit();
 
 	for(;;);
 }
