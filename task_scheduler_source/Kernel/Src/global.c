@@ -12,6 +12,3 @@ uint32_t g_tick_count = 0;
 
 /* Each task has its own TCB */
 TCB_t user_tasks[MAX_TASKS];
-
-//Registers
-SCB_t* SCB = (SCB_t*)SCB_BASE;

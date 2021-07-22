@@ -11,11 +11,22 @@
 #include "stm32f407xx.h"
 #include "spi_drivers.h"
 
-static void SPI1_ClockEnable()
+/*
+***********************************************************************************
+*                           Private Functions                                     *
+**********************************************************************************/
+
+static void SPI1_EnableAllClocks()
 {
 	GPIOA_PCLK_EN();
 	GPIOB_PCLK_EN();
 	SPI1_PCLK_EN();
+}
+
+static void SPI2_EnableAllClocks()
+{
+	GPIOB_PCLK_EN();
+	SPI2_PCLK_EN();
 }
 
 static void SPI1_PinInit()
@@ -41,9 +52,13 @@ static void SPI_Enable(SPI_RegDef_t *SPIx)
 	SPIx->CR1 |= (ENABLE << SPI_CR1_SPE);
 }
 
+/**********************************************************************************************
+ *                                Public Functions                                            *
+ * *******************************************************************************************/
+
 void SPI_Init(SPI_RegDef_t *SPIx)
 {
-	SPI1_ClockEnable();
+	SPI1_EnableAllClocks();
 	SPI1_PinInit();
 
 	SPI_Config(SPIx);
@@ -57,24 +72,27 @@ void SPI1_Write(uint8_t *data)
 {
 	uint32_t len = strlen((char *)data);
 
-	while(len > 0)
-	{
-		while(SPI1->SR & (DISABLE << SPI_SR_TXE)){};
+	 while(len > 0)
+	 {
+	 	while(SPI1->SR & (DISABLE << SPI_SR_TXE)){};
 
-		if(SPI1->CR1 & (1 << SPI_CR1_DFF))
-		{
-			SPI1->DR = *((uint16_t*)data);
-			len--;
-			len--;
-			(uint16_t*)data++;
-		}
-		else
-		{
-			SPI1->DR = *data;
-			len--;
-			data++;
-		}
-	}
+	 	if(SPI1->CR1 & (1 << SPI_CR1_DFF))
+	 	{
+	 		SPI1->DR = *((uint16_t*)data);
+	 		len--;
+	 		len--;
+	 		(uint16_t*)data++;
+	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
+	 	}
+	 	else
+	 	{
+	 		SPI1->DR = *data;
+	 		len--;
+	 		data++;
+	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
+
+	 	}
+	 }
 }
 
 void SPI1_Transmit(uint8_t *data)

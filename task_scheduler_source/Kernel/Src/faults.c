@@ -9,19 +9,12 @@
 #include <stdio.h>
 #include "registers.h"
  
-extern SCB_t *SCB;
 
 void enable_processor_faults(void)
 {
 	/*Usage, Mem and Bus fault, not in order. If disabled and fault is invoked, hardfault*/
-	SCB->SHCSR |= (1 << 16) | (1 << 17); //mem, bus, usage
-	#if 0
-	uint32_t *pSHCSR = (uint32_t*)0xE000ED24;
+	SYS->SHCSR |= (1 << 16) | (1 << 17) | (1 << 18); //mem, bus, usage
 
-	*pSHCSR |= ( 1 << 16); //mem manage
-	*pSHCSR |= ( 1 << 17); //bus fault
-	*pSHCSR |= ( 1 << 18); //usage fault
-	#endif
 }
 
 //2. implement the fault handlers
@@ -52,8 +45,8 @@ __attribute__((naked)) void MemManage_Handler_C(uint32_t *stack)
 {
 	printf("Exception : MemManage\n");
 	//uint32_t *pMMSR = (uint32_t*)0xE000ED28;
-	printf("SCB->MMSR Address = %p\n", &SCB->CFSR);
-	printf("MMSR = %lx\n", SCB->CFSR & 0xffff);
+	printf("SCB->MMSR Address = %p\n", &SYS->CFSR);
+	printf("MMSR = %lx\n", SYS->CFSR & 0xffff);
 	printf("R0 = %p\n", stack);
 	while(1);
 }
@@ -85,8 +78,8 @@ __attribute__((naked)) void UsageFault_Handler(void)
 void UsageFault_Handler_C(uint32_t *stack)
 {
 	printf("Exception: UsageFault\n");
-	printf("SCB->MMSR Address = %p\n", &SCB->CFSR);
-	printf("UFSR = %lx\n", (SCB->CFSR) & 0xffff0000);
+	printf("SCB->MMSR Address = %p\n", &SYS->CFSR);
+	printf("UFSR = %lx\n", (SYS->CFSR) & 0xffff0000);
 	printf("MSP Base = %p\n", stack);
 
 	while(1);

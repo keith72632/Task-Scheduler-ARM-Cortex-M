@@ -13,7 +13,7 @@ void task1_handler(void)
 {
 	while(1)
 	{
-		uint8_t spi_rx_data[] = "sp";
+		uint8_t spi_rx_data[] = "sp\n\r";
 		SPI1_Transmit(spi_rx_data);
 		uint8_t num[] = "taskOne\n";
 		uputs(num);

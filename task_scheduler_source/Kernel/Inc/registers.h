@@ -3,9 +3,9 @@
 #ifndef REGISTERS_H
 #define REGISTERS_H
 
-#define SCB_BASE 0xe000ed00
+#define SCB_BASE 0xE000ED00
 //System Control Block
-typedef struct SCB {
+typedef struct {
     uint32_t CPUID;
     uint32_t ICSR; //Interrupt Status Control Register. Base + 0x04
     uint32_t VTOR; //Vector Table Offset Register. Base + 0x08
@@ -31,4 +31,6 @@ typedef struct FaultStack {
    uint32_t reg0, reg1, reg2, reg3, reg12, link, progC, XPSR; 
 }FaultStack_t;
 
+//System Control Block
+#define SYS   ((SCB_t*)SCB_BASE)
 #endif

@@ -53,7 +53,7 @@ void  SysTick_Handler(void)
     unblock_tasks();
 
     //pend the pendsv exception
-    SCB->ICSR |= ( 1 << 28);
+    SYS->ICSR |= ( 1 << 28);
 }
 
 
