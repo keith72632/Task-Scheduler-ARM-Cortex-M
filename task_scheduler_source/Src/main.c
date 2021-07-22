@@ -23,6 +23,7 @@
 
 #include<stdio.h>
 #include <stdint.h>
+#include "kernel.h"
 #include"main.h"
 #include "led.h"
 #include "psp.h"
@@ -51,20 +52,7 @@ extern TCB_t user_tasks[MAX_TASKS];
 //Registers
 extern SCB_t* SCB;
 
-void OS_KernelInit()
-{
-	enable_processor_faults();
 
-	init_scheduler_stack(SCHED_STACK_START);
-
-	init_tasks_stack();
-
-	init_systick_timer(TICK_HZ);
-
-	switch_sp_to_psp();
-
-	task1_handler();
-}
 
 int main(void)
 {
