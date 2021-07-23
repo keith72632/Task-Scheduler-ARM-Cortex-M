@@ -424,6 +424,8 @@ typedef struct
 
 //some generic macros
 
+#define FULL                1
+#define EMPTY               0
 #define ENABLE 				1
 #define DISABLE 			0
 #define SET 				ENABLE

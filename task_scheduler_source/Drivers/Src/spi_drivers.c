@@ -10,6 +10,7 @@
 #include <string.h>
 #include "stm32f407xx.h"
 #include "spi_drivers.h"
+#include "uart_drivers.h"
 
 /*
 ***********************************************************************************
@@ -95,12 +96,50 @@ void SPI1_Write(uint8_t *data)
 	 }
 }
 
+void SPI1_Read(uint8_t *buffer, uint32_t len)
+{
+
+	 while(len > 0)
+	 {
+	 	while(SPI1->SR & (EMPTY << SPI_SR_RXNE)){};
+
+	 	if(SPI1->CR1 & (1 << SPI_CR1_DFF))
+	 	{
+	 		*((uint16_t*)buffer) = SPI1->DR;
+	 		len--;
+	 		len--;
+	 		(uint16_t*)buffer++;
+	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
+	 	}
+	 	else
+	 	{
+	 		*buffer = SPI1->DR;
+	 		len--;
+	 		buffer++;
+	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
+
+	 	}
+	 }
+	uputs(buffer);
+}
+
 void SPI1_Transmit(uint8_t *data)
 {
 
 	NSS_PIN_LOW();
 
 	SPI1_Write(data);
+
+	NSS_PIN_HIGH();
+
+}
+
+void SPI1_Receive(uint8_t *data, uint32_t len)
+{
+
+	NSS_PIN_LOW();
+
+	SPI1_Read(data, len);
 
 	NSS_PIN_HIGH();
 
