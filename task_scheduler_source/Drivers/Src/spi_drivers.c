@@ -109,18 +109,20 @@ void SPI1_Read(uint8_t *buffer, uint32_t len)
 	 		len--;
 	 		len--;
 	 		(uint16_t*)buffer++;
-	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
+//	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
 	 	}
 	 	else
 	 	{
 	 		*buffer = SPI1->DR;
 	 		len--;
 	 		buffer++;
-	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
+//	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
 
 	 	}
 	 }
-	uputs(buffer);
+
+
+//	uputs(buffer);
 }
 
 void SPI1_Transmit(uint8_t *data)
