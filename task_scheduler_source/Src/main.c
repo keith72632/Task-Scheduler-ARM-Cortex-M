@@ -32,6 +32,7 @@
 #include "tasks.h"
 #include "uart_drivers.h"
 #include "spi_drivers.h"
+#include "timers.h"
 #include "stm32f407xx.h"
 
 void usart_init(void);
@@ -62,10 +63,18 @@ int main(void)
 
 	SPI_Init(SPI1);
 
+	TIM_6_Init();
+
 	OS_KernelInit();
 
 	for(;;);
 }
 
+void TIM6_DAC_IRQHandler()
+{
+	uint8_t tim[] = "timer\n";
+	uputs(tim);
+	while(1);
+}
 
 

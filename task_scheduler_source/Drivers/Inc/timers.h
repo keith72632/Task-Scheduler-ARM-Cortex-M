@@ -16,13 +16,15 @@ typedef struct{
     uint32_t DIER;
     uint32_t SR;
     uint32_t EGR;
-    uint32_t CNT;
-    uint32_t PSC;
-    uint32_t ARR;
+    uint16_t FILLER;
+    uint16_t CNT;
+    uint16_t PSC;
+    uint16_t ARR;
 }TIM_RegDef_t;
 
 #define TIM_6_BASE_ADDR 0x40001000
 #define TIM_6           ((TIM_RegDef_t *)TIM_6_BASE_ADDR)
+#define TIM_6_INTERRUPT 54
 
 //TIM6 CR1 registers
 #define CEN    0
@@ -44,5 +46,8 @@ typedef struct{
 
 //macros for clock
 #define TIM_6_CLK_EN() (RCC->APB1ENR |= (1 << 4))
+
+//prototypes
+void TIM_6_Init(void);
 
 #endif /* INC_TIMERS_H_ */
