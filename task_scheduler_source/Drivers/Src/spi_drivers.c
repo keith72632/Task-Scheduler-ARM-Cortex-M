@@ -102,32 +102,28 @@ void SPI1_Write(uint8_t *data)
 void SPI1_Read(uint8_t *buffer, uint32_t len)
 {
 
-	for(int i = 0; i < len; i++)
-	{
-		buffer[i] = SPI1->DR;
-	}
 
-//	 while(len > 0)
-//	 {
-//	 	while(SPI1->SR & (EMPTY << SPI_SR_RXNE)){};
-//
-//	 	if(SPI1->CR1 & (1 << SPI_CR1_DFF))
-//	 	{
-//	 		*((uint16_t*)buffer) = SPI1->DR;
-//	 		len--;
-//	 		len--;
-//	 		(uint16_t*)buffer++;
-////	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
-//	 	}
-//	 	else
-//	 	{
-//	 		*buffer = SPI1->DR;
-//	 		len--;
-//	 		buffer+=sizeof(uint8_t);
+	 while(len > 0)
+	 {
+	 	while(SPI1->SR & (EMPTY << SPI_SR_RXNE)){};
+
+	 	if(SPI1->CR1 & (1 << SPI_CR1_DFF))
+	 	{
+	 		*((uint16_t*)buffer) = SPI1->DR;
+	 		len--;
+	 		len--;
+	 		(uint16_t*)buffer++;
 //	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
-//
-//	 	}
-//	 }
+	 	}
+	 	else
+	 	{
+	 		*buffer = SPI1->DR;
+	 		len--;
+	 		buffer+=sizeof(uint8_t);
+	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
+
+	 	}
+	 }
 
 
 //	uputs(buffer);

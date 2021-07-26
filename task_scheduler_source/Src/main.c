@@ -34,6 +34,7 @@
 #include "spi_drivers.h"
 #include "timers.h"
 #include "stm32f407xx.h"
+#include "gpio_drivers.h"
 
 void usart_init(void);
 void uart_write(uint8_t c);
@@ -67,6 +68,8 @@ int main(void)
 
 //	TIM_6_Init();
 
+	gpio_test_init();
+
 	OS_KernelInit();
 
 	for(;;);
@@ -92,4 +95,10 @@ void SPI1_IRQHandler(void)
 	while(1);
 }
 
+
+void EXTI0_IRQHandler()
+{
+//	uint8_t success[] = "gpio\n";
+//	uputs(success);
+}
 
