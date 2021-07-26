@@ -66,6 +66,9 @@ void SPI_Init(SPI_RegDef_t *SPIx)
 
 	SPI_Enable(SPIx);
 
+	SPI_IRQInterruptConfig(IRQ_NO_SPI1, ENABLE);
+
+
 	NSS_PIN_HIGH();
 }
 
@@ -99,27 +102,32 @@ void SPI1_Write(uint8_t *data)
 void SPI1_Read(uint8_t *buffer, uint32_t len)
 {
 
-	 while(len > 0)
-	 {
-	 	while(SPI1->SR & (EMPTY << SPI_SR_RXNE)){};
+	for(int i = 0; i < len; i++)
+	{
+		buffer[i] = SPI1->DR;
+	}
 
-	 	if(SPI1->CR1 & (1 << SPI_CR1_DFF))
-	 	{
-	 		*((uint16_t*)buffer) = SPI1->DR;
-	 		len--;
-	 		len--;
-	 		(uint16_t*)buffer++;
+//	 while(len > 0)
+//	 {
+//	 	while(SPI1->SR & (EMPTY << SPI_SR_RXNE)){};
+//
+//	 	if(SPI1->CR1 & (1 << SPI_CR1_DFF))
+//	 	{
+//	 		*((uint16_t*)buffer) = SPI1->DR;
+//	 		len--;
+//	 		len--;
+//	 		(uint16_t*)buffer++;
+////	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
+//	 	}
+//	 	else
+//	 	{
+//	 		*buffer = SPI1->DR;
+//	 		len--;
+//	 		buffer+=sizeof(uint8_t);
 //	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
-	 	}
-	 	else
-	 	{
-	 		*buffer = SPI1->DR;
-	 		len--;
-	 		buffer++;
-//	 		while(SPI1->SR & (1 << SPI_SR_BSY)){};
-
-	 	}
-	 }
+//
+//	 	}
+//	 }
 
 
 //	uputs(buffer);
@@ -145,4 +153,27 @@ void SPI1_Receive(uint8_t *data, uint32_t len)
 
 	NSS_PIN_HIGH();
 
+}
+
+/*
+ * Interrupt Config
+ */
+
+void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
+{
+	if(EnorDi)
+	{
+		if(IRQNumber <= 31)
+		{
+			*NVIC_ISER0 |= (1 << IRQNumber);
+		}
+		else if(IRQNumber > 31 && IRQNumber < 64)
+		{
+			*NVIC_ISER1 |= (1 << (IRQNumber % 32));
+		}
+		else if(IRQNumber > 64 && IRQNumber < 96)
+		{
+			*NVIC_ISER2 |= (1 << (IRQNumber % 64));
+		}
+	}
 }

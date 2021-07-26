@@ -19,10 +19,10 @@ void task1_handler(void)
 		uint8_t num[] = "taskOne\n\r";
 		uputs(num);
 
-		uint8_t receive_buffer[12];
- 		SPI1_Receive(receive_buffer, 12);
+		uint8_t receive_buffer[7];
+ 		SPI1_Receive(receive_buffer, 7);
 		task_delay(10);
-//		uputs(receive_buffer);
+		uputs(receive_buffer);
 		led_on(LED_GREEN);
 		task_delay(2000);
 		led_off(LED_GREEN);

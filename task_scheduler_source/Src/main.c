@@ -53,6 +53,8 @@ extern TCB_t user_tasks[MAX_TASKS];
 //Registers
 extern SCB_t* SCB;
 
+uint32_t timer = 0;
+
 
 
 int main(void)
@@ -63,7 +65,7 @@ int main(void)
 
 	SPI_Init(SPI1);
 
-	TIM_6_Init();
+//	TIM_6_Init();
 
 	OS_KernelInit();
 
@@ -73,7 +75,20 @@ int main(void)
 void TIM6_DAC_IRQHandler()
 {
 	uint8_t tim[] = "timer\n";
-	uputs(tim);
+
+	timer++;
+	if(timer > 200000)
+	{
+		uputs(tim);
+		timer = 0;
+	}
+//	while(1);
+}
+
+void SPI1_IRQHandler(void)
+{
+	uint8_t success[] = "success\n";
+	uputs(success);
 	while(1);
 }
 
