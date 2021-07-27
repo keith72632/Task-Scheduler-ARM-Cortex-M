@@ -54,3 +54,43 @@ void gpio_test_init()
 
 	gpio_priority((uint8_t)IRQ_NO_EXTI0, NVIC_IRQ_PRI15);
 }
+
+void green_led_toggle()
+{
+	GPIOD_PCLK_EN();
+	GPIOD->MODER |= (1 << 24);
+
+	if(GPIOD->ODR & (1 << 12))
+	{
+		GPIOD->ODR &= ~(1 << 12);
+	}
+	else
+	{
+		GPIOD->ODR |= (1 << 12);
+	}
+}
+
+void blue_led_toggle()
+{
+	GPIOD_PCLK_EN();
+	GPIOD->MODER |= (1 << 30);
+
+	if(GPIOD->ODR & (1 << 15))
+	{
+		GPIOD->ODR &= ~(1 << 15);
+	}
+	else
+	{
+		GPIOD->ODR |= (1 << 15);
+	}
+}
+
+void clear_interrupt(uint8_t int_no)
+{
+	*NVIC_ICER0 |= (1 << int_no);
+}
+
+void enable_interrupt(uint8_t int_no)
+{
+	*NVIC_ISER0 |= (1 << int_no);
+}

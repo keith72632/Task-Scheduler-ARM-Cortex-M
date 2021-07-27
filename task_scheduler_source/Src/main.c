@@ -68,7 +68,7 @@ int main(void)
 
 //	TIM_6_Init();
 
-	gpio_test_init();
+//	gpio_test_init();
 
 	OS_KernelInit();
 
@@ -98,7 +98,7 @@ void SPI1_IRQHandler(void)
 
 void EXTI0_IRQHandler()
 {
-//	uint8_t success[] = "gpio\n";
+	uint8_t success[] = "gpio\n";
 //	uputs(success);
 }
 
