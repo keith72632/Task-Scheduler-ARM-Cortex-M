@@ -14,6 +14,7 @@
 #define BAUD_RATE_9600 0x0683U
 
 void USART_Init(USART_RegDef_t *pUSARTx);
+void usart_write(uint8_t c);
 void uputs(uint8_t *s);
 
 #endif /* INC_UART_DRIVERS_H_ */
